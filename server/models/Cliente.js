@@ -7,7 +7,8 @@ const clienteSchema = new mongoose.Schema({
   username: { type: String, required: true, unique: true },
   password: { type: String, required: true, minlength: 6 },
   telefono: { type: String },
-  direccion: { type: String }
+  direccion: { type: String },
+  ciudad: { type: String }
 }, {
   timestamps: true,
   toJSON: {
