@@ -7,6 +7,7 @@ import DetalleCliente from '../pages/DetalleCliente'
 import ErrorPage from '../pages/ErrorPage'
 import RutaProtegida from '../components/RutaProtegida'
 import FormCliente from '../components/FormCliente'
+import RegistroUsuario from '../pages/RegistroUsuario'
 const AppRoutes = () => {
   return (
     <Routes>
