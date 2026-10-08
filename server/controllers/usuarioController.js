@@ -11,17 +11,15 @@ const registrarUsuario= async (req,res) =>{
     }
 }
 
-const login=async(req,res)=>{
-    try{
-        const {email,password} = req.body;
-        const{token,usuario}= await usuarioService.loginUsuario(email,password);
-        res.status(200).json({token,usuario});
-    }catch(error){
-        res.status(401).json({
-            mensaje:error.message
-        })
-    }
-};
+const login = async (req, res) => {
+  try {
+    const { email, password } = req.body
+    const { token, usuario } = await usuarioService.loginUsuario(email, password)
+    res.status(200).json({ token, usuario }) 
+  } catch (error) {
+    res.status(401).json({ mensaje: error.message })
+  }
+}
 
 const deleteUser=async(req,res)=>{
     try{
@@ -35,8 +33,21 @@ const deleteUser=async(req,res)=>{
         
     }
 }
+const listarUsuarios = async (req, res) => {
+  try {
+    const Usuario = require('../models/Usuario')
+    const usuarios = await Usuario.find({}, '-password') // sin password
+    res.json(usuarios)
+  } catch (error) {
+    res.status(500).json({ error: error.message })
+  }
+}
+
+
 module.exports ={
     registrarUsuario,
     login,
-    deleteUser
+    deleteUser,
+    listarUsuarios
+    
 };
