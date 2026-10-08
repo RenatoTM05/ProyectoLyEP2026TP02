@@ -37,5 +37,6 @@ const deleteUser=async(req,res)=>{
 }
 module.exports ={
     registrarUsuario,
-    login
+    login,
+    deleteUser
 };
