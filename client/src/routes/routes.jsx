@@ -7,20 +7,10 @@ import DetalleCliente from '../pages/DetalleCliente'
 import ErrorPage from '../pages/ErrorPage'
 import RutaProtegida from '../components/RutaProtegida'
 import FormCliente from '../components/FormCliente'
-import RegistroUsuario from '../pages/RegistroUsuario'
-
 const AppRoutes = () => {
   return (
     <Routes>
 
-      <Route
-        path="/registro"
-        element={
-          <RutaProtegida>
-            <RegistroUsuario />
-          </RutaProtegida>
-        }
-      />
       <Route path="/login" element={<Login />} />
       <Route
         path="/"
@@ -39,6 +29,7 @@ const AppRoutes = () => {
       }
       />
 
+      
       <Route
         path="/clientes"
         element={
