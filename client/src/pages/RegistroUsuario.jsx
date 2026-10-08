@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-
-const API_URL = 'http://localhost:3001/api/usuarios'
+import autorizacionesService from '../services/autorizacionesServices'   
 
 const RegistroUsuario = () => {
   const navigate = useNavigate()
@@ -23,27 +22,20 @@ const RegistroUsuario = () => {
     setError('')
     setExito('')
 
-    try {
-      const response = await fetch(`${API_URL}/registro`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form)
-      })
+     const token = localStorage.getItem('token')
 
-      const data = await response.json()
+    if (!token) {
+      setError('No hay sesión activa. Iniciá sesión primero.')
+      return
+    }
 
-      if (!response.ok) {
-        setError(data.mensaje || 'Error al registrar usuario')
-        return
-      }
+     const resultado = await autorizacionesService.createUser(form, token)
 
-      setExito('Usuario creado correctamente. Ya podés iniciar sesión.')
+    if (resultado.ok) {
+      setExito('Usuario creado correctamente.')
       setForm({ email: '', password: '', nombre: '', sector: 'Soporte' })
-
-      // Opcional: redirigir al login después de 2 segundos
-      setTimeout(() => navigate('/login'), 2000)
-    } catch (err) {
-      setError('Error de conexión con el servidor')
+    } else {
+      setError(resultado.error)
     }
   }
 
@@ -57,50 +49,26 @@ const RegistroUsuario = () => {
       <form onSubmit={handleSubmit}>
         <div className="mb-3">
           <label className="form-label">Email</label>
-          <input
-            type="email"
-            name="email"
-            className="form-control"
-            value={form.email}
-            onChange={handleChange}
-            required
-          />
+          <input type="email" name="email" className="form-control"
+            value={form.email} onChange={handleChange} required />
         </div>
 
         <div className="mb-3">
           <label className="form-label">Contraseña</label>
-          <input
-            type="password"
-            name="password"
-            className="form-control"
-            value={form.password}
-            onChange={handleChange}
-            minLength={6}
-            required
-          />
+          <input type="password" name="password" className="form-control"
+            value={form.password} onChange={handleChange} minLength={6} required />
         </div>
 
         <div className="mb-3">
           <label className="form-label">Nombre</label>
-          <input
-            type="text"
-            name="nombre"
-            className="form-control"
-            value={form.nombre}
-            onChange={handleChange}
-            required
-          />
+          <input type="text" name="nombre" className="form-control"
+            value={form.nombre} onChange={handleChange} required />
         </div>
 
         <div className="mb-3">
           <label className="form-label">Sector</label>
-          <select
-            name="sector"
-            className="form-select"
-            value={form.sector}
-            onChange={handleChange}
-            required
-          >
+          <select name="sector" className="form-select"
+            value={form.sector} onChange={handleChange} required>
             <option value="Soporte">Soporte</option>
             <option value="Gerencia">Gerencia</option>
           </select>

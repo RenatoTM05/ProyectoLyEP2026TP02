@@ -48,8 +48,10 @@ const Login = () => {
 
     const resultado = await autorizacionesService.login(email, password, sector)
 
+    
     if (resultado.ok) {
       setAdmin(resultado.usuario)
+      localStorage.setItem('token', resultado.token) 
       localStorage.setItem('role', resultado.usuario.sector)
       navigate('/')
     } else {
