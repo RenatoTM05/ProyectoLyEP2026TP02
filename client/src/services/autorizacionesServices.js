@@ -15,7 +15,7 @@ const login = async (email, password, sector) => {
   }
 }
 
-const createUser = async (datosUsuario, token) => {
+const createUser = async (datosUser, token) => {
   try {
     const response = await fetch(`${API_URL}/registro`, {
       method: 'POST',
@@ -23,7 +23,7 @@ const createUser = async (datosUsuario, token) => {
         'Content-Type': 'application/json',
         'Authorization': `Bearer ${token}`
       },
-      body: JSON.stringify(datosUsuario)
+      body: JSON.stringify(datosUser)
     })
     const data = await response.json()
     if (!response.ok) return { ok: false, error: data.mensaje || 'ERROR' }

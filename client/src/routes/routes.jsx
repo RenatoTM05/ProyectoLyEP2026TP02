@@ -13,6 +13,7 @@ const AppRoutes = () => {
   return (
     <Routes>
 
+
       <Route
         path="/registro"
         element={

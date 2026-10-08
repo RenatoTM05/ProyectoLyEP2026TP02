@@ -68,6 +68,7 @@ const Login = () => {
         <input type="text" value={email} onChange={(e) => setEmail(e.target.value)} />
         <p style={{ color: 'red', minHeight: '18px' }}>{errores.email || ' '}</p>
 
+
         <label>Contraseña:</label>
         <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} />
         <p style={{ color: 'red', minHeight: '18px' }}>{errores.password || ' '}</p>

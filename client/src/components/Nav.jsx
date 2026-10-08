@@ -28,7 +28,7 @@ const Nav = () => {
                 {admin && (
                     <li>
                         <NavLink to="/registro">
-                            Crear Usuario
+                            Crear Usuarios
                         </NavLink>
                     </li>
                 )}

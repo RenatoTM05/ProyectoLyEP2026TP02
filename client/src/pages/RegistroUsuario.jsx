@@ -13,6 +13,7 @@ const RegistroUsuario = () => {
   const [error, setError] = useState('')
   const [exito, setExito] = useState('')
 
+  
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value })
   }
