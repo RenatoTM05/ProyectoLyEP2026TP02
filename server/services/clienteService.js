@@ -9,7 +9,29 @@ const obtenerClientes = async () => {
   return await Cliente.find();
 };
 
+const obtenerClientePorId = async (id) => {
+  return await Cliente.findById(id);
+};
+
+const actualizarCliente = async (id, datosCliente) => {
+  return await Cliente.findByIdAndUpdate(
+    id,
+    datosCliente,
+    {
+      new: true,
+      runValidators: true
+    }
+  );
+};
+
+const eliminarCliente = async (id) => {
+  return await Cliente.findByIdAndDelete(id);
+};
+
 module.exports = {
   crearCliente,
-  obtenerClientes
+  obtenerClientes,
+  obtenerClientePorId,
+  actualizarCliente,
+  eliminarCliente
 };
