@@ -10,7 +10,14 @@ import FormCliente from '../components/FormCliente'
 const AppRoutes = () => {
   return (
     <Routes>
-
+      <Route
+        path="/registro"
+        element={
+          <RutaProtegida>
+            <RegistroUsuario />
+          </RutaProtegida>
+        }
+      />
       <Route path="/login" element={<Login />} />
       <Route
         path="/"

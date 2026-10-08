@@ -25,6 +25,13 @@ const Nav = () => {
                         </NavLink>
                     </li>
                 )}
+                {admin && (
+                    <li>
+                        <NavLink to="/registro">
+                            Crear Usuarios
+                        </NavLink>
+                    </li>
+                )}
             </ul>
         </nav>
     );

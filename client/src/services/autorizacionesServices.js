@@ -1,51 +1,36 @@
-const usuarios = [
-  {
-    email: 'antonella@gmail.com',
-    password: 'Admin123',
-    nombre: 'Antonella',
-    sector: 'Soporte'
-  },
-  {
-    email: 'jimena@gmail.com',
-    password: 'Admin123',
-    nombre: 'Jimena',
-    sector: 'Gerencia'
-  },
-  {
-    email: 'maia@gmail.com',
-    password: 'Admin123',
-    nombre: 'Maia',
-    sector: 'Gerencia'
-  },
-  {
-    email: 'abril@gmail.com',
-    password: 'Admin123',
-    nombre: 'Abril',
-    sector: 'Soporte'
-  },
-  {
-    email: 'guadalupe@gmail.com',
-    password: 'Admin123',
-    nombre: 'Guadalupe',
-    sector: 'Soporte'
-  },
-  {
-    email: 'lourdes@gmail.com',
-    password: 'Admin123',
-    nombre: 'Lourdes',
-    sector: 'Gerencia'
-  }
-]
-const login = (email, password, sector) => {
-  const usuario = usuarios.find(
-    u => u.email.toLowerCase() === email && u.password === password
-  )
-  if (!usuario) return { ok: false, error: 'CREDENCIALES' }
-  if (usuario.sector !== sector) return { ok: false, error: 'SECTOR' }
+const API_URL = 'http://localhost:3001/api/usuarios'
 
-  const { password: _omit, ...usuarioSeguro } = usuario  
-  return { ok: true, usuario: usuarioSeguro }
+const login = async (email, password, sector) => {
+  try {
+    const response = await fetch(${API_URL}/login, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password, sector })
+    })
+    const data = await response.json()
+    if (!response.ok) return { ok: false, error: data.mensaje  'CREDENCIALES' }
+    return { ok: true, usuario: data.usuario, token: data.token }
+  } catch (error) {
+    return { ok: false, error: 'SERVIDOR' }
+  }
 }
-export default {
-  login
+
+const createUser = async (datosUser, token) => {
+  try {
+    const response = await fetch(${API_URL}/registro, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': Bearer ${token}
+      },
+      body: JSON.stringify(datosUser)
+    })
+    const data = await response.json()
+    if (!response.ok) return { ok: false, error: data.mensaje  'ERROR' }
+    return { ok: true, usuario: data }
+  } catch (error) {
+    return { ok: false, error: 'SERVIDOR' }
+  }
 }
+
+export default { login, createUser }
