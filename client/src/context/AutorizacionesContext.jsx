@@ -23,6 +23,8 @@ useEffect(()=>{
 
 },[admin])
 const cerrarSesion=()=>{
+  localStorage.removeItem('token')
+  localStorage.removeItem('role')
   setAdmin(null)
 }
 return (
