@@ -18,4 +18,19 @@ const protegerRuta = (req, res, next) => {
     }
 };
 
-module.exports = { protegerRuta };
+// Middleware para autorizar por sector (ej: 'Gerencia')
+const autorizarSector = (...sectoresPermitidos) => {
+    return (req, res, next) => {
+        if (!req.usuario) {
+            return res.status(401).json({ mensaje: 'No autorizado, usuario no autenticado' });
+        }
+        if (!sectoresPermitidos.includes(req.usuario.sector)) {
+            return res.status(403).json({ 
+                mensaje: `Acceso denegado: acción exclusiva para el sector ${sectoresPermitidos.join(' o ')}` 
+            });
+        }
+        next();
+    };
+};
+
+module.exports = { protegerRuta, autorizarSector };
