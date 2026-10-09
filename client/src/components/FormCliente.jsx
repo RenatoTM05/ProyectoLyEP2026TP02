@@ -8,7 +8,7 @@ const FormCliente = ({ cliente }) => {
 
     const [nombre, setNombre] = useState("");
     const [email, setEmail] = useState("");
-    const [contraseña,setContraseña]=useState("");
+    const [contraseña, setContraseña] = useState("");
     const [telefono, setTelefono] = useState("");
     const [ciudad, setCiudad] = useState("");
 
@@ -19,10 +19,10 @@ const FormCliente = ({ cliente }) => {
 
     useEffect(() => {
         if (cliente) {
-            setNombre(cliente.name.firstname);
-            setEmail(cliente.email);
-            setTelefono(cliente.phone);
-            setCiudad(cliente.address.city);
+            setNombre(cliente.nombre || cliente.name?.firstname || "");
+            setEmail(cliente.email || "");
+            setTelefono(cliente.telefono || cliente.phone || "");
+            setCiudad(cliente.ciudad || cliente.address?.city || "");
         }
     }, [cliente]);
 
@@ -42,72 +42,62 @@ const FormCliente = ({ cliente }) => {
             setError("Complete todos los campos.");
             return;
         }
-const emailNormalizado = email.trim();
-const telefonoNormalizado = telefono.trim();
-const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
-const telefonoRegex = /^\d{10}$/;
 
-if (!emailRegex.test(emailNormalizado) || !telefonoRegex.test(telefonoNormalizado)){
-            setError("Debe ingresar un formato de email o telefonos valido")
+        const emailNormalizado = email.trim();
+        const telefonoNormalizado = telefono.trim();
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+        const telefonoRegex = /^\d{10}$/;
+
+        if (!emailRegex.test(emailNormalizado) || !telefonoRegex.test(telefonoNormalizado)) {
+            setError("Debe ingresar un formato de email o teléfono válido (10 dígitos).");
             return;
         }
-        if(contraseña.length<8 || !/[A-Z]/.test(contraseña) || !/[0-9]/.test(contraseña)){
+
+        if (!cliente && (contraseña.length < 8 || !/[A-Z]/.test(contraseña) || !/[0-9]/.test(contraseña))) {
             setError(
-        "Parámetros de contraseña incorrectos. La contraseña debe tener: " +
-        "mínimo 8 caracteres, una mayúscula y un número."
+                "Parámetros de contraseña incorrectos. La contraseña debe tener: " +
+                "mínimo 8 caracteres, una mayúscula y un número."
             );
-                return;
+            return;
         }
-    
+
+        // Estructura adaptada al esquema de MongoDB
         const nuevoCliente = {
-
+            nombre: nombre.trim(),
+            apellido: cliente?.apellido || "-",
             email: emailNormalizado,
-
-            username: nombre.toLowerCase().replace(/\s/g, ""),
-
-            password: contraseña,
-
-            name: {
-                firstname: nombre,
-                lastname: "-"
-            },
-
-            address: {
-                city: ciudad
-            },
-
-            phone: telefonoNormalizado
+            username: cliente?.username || (nombre.toLowerCase().replace(/\s/g, "") + Math.floor(Math.random() * 100)),
+            password: contraseña || "Password123",
+            telefono: telefonoNormalizado,
+            ciudad: ciudad.trim(),
+            direccion: cliente?.direccion || "-"
         };
 
-       try{
-                setLoading(true);
-                let respuesta;
-                if (cliente) {
-                    respuesta = await clientesService.actualizarCliente(cliente.id, nuevoCliente);
-                    setMensaje(`Cliente actualizado correctamente. ID: ${cliente.id}`);
+        try {
+            setLoading(true);
+            let respuesta;
+            if (cliente) {
+                respuesta = await clientesService.actualizarCliente(cliente.id || cliente._id, nuevoCliente);
+                setMensaje(`Cliente actualizado correctamente. ID: ${cliente.id || cliente._id}`);
+            } else {
+                respuesta = await clientesService.crearCliente(nuevoCliente);
+                setMensaje(`Cliente creado correctamente. ID: ${respuesta.id || respuesta._id}`);
+            }
 
-                        setNombre("");
-                        setEmail("");
-                        setTelefono("");
-                        setCiudad("");
+            setNombre("");
+            setEmail("");
+            setContraseña("");
+            setTelefono("");
+            setCiudad("");
 
-                } else {
-
-                    respuesta = await clientesService.crearCliente(nuevoCliente);
-                    setMensaje(`Cliente creado correctamente. ID: ${respuesta.id}`);
-                    setNombre("");
-                    setEmail("");
-                    setTelefono("");
-                    setCiudad("");
-                }
-
-                setTimeout(() => {
-                    navigate("/clientes");
-                }, 1500);
-
-        } catch {
-            setError( cliente  ? "Ocurrió un error al actualizar el cliente."    : "Ocurrió un error al crear el cliente.");
-
+            setTimeout(() => {
+                navigate("/clientes");
+            }, 1500);
+        } catch (err) {
+            setError(
+                err.response?.data?.mensaje ||
+                (cliente ? "Ocurrió un error al actualizar el cliente." : "Ocurrió un error al crear el cliente.")
+            );
         } finally {
             setLoading(false);
         }
@@ -129,7 +119,7 @@ if (!emailRegex.test(emailNormalizado) || !telefonoRegex.test(telefonoNormalizad
                     <Form.Control
                         type="text"
                         value={nombre}
-                        onChange={(e) =>setNombre(e.target.value)}
+                        onChange={(e) => setNombre(e.target.value)}
                     />
 
                 </Form.Group>
@@ -141,7 +131,8 @@ if (!emailRegex.test(emailNormalizado) || !telefonoRegex.test(telefonoNormalizad
                     <Form.Control
                         type="password"
                         value={contraseña}
-                        onChange={(e) =>setContraseña(e.target.value)}
+                        placeholder={cliente ? "Dejar en blanco para conservar o ingresar nueva" : ""}
+                        onChange={(e) => setContraseña(e.target.value)}
                     />
                     <Form.Text muted>
                         Debe tener mínimo 8 caracteres, una mayúscula y un número.
@@ -156,9 +147,7 @@ if (!emailRegex.test(emailNormalizado) || !telefonoRegex.test(telefonoNormalizad
                     <Form.Control
                         type="email"
                         value={email}
-                        onChange={(e) =>
-                            setEmail(e.target.value)
-                        }
+                        onChange={(e) => setEmail(e.target.value)}
                     />
 
                 </Form.Group>
@@ -171,9 +160,7 @@ if (!emailRegex.test(emailNormalizado) || !telefonoRegex.test(telefonoNormalizad
                         type="text"
                         placeholder="Ej. 1234567890"
                         value={telefono}
-                        onChange={(e) =>
-                            setTelefono(e.target.value)
-                        }
+                        onChange={(e) => setTelefono(e.target.value)}
                     />
 
                 </Form.Group>
@@ -185,9 +172,7 @@ if (!emailRegex.test(emailNormalizado) || !telefonoRegex.test(telefonoNormalizad
                     <Form.Control
                         type="text"
                         value={ciudad}
-                        onChange={(e) =>
-                            setCiudad(e.target.value)
-                        }
+                        onChange={(e) => setCiudad(e.target.value)}
                     />
 
                 </Form.Group>
@@ -197,40 +182,15 @@ if (!emailRegex.test(emailNormalizado) || !telefonoRegex.test(telefonoNormalizad
                     type="submit"
                     disabled={loading}
                 >
-
-                    {
-                        loading
-                            ? <Spinner size="sm" />
-                            : cliente ?
-                            "Editar Cliente"
-                            : "Crear Cliente"
-                    }
-
+                    {loading ? <Spinner size="sm" /> : cliente ? "Editar Cliente" : "Crear Cliente"}
                 </Button>
 
             </Form>
 
-            {
-                mensaje &&
-                <Alert
-                    className="mt-3"
-                    variant="success">
-                    {mensaje}
-                </Alert>
-            }
-
-            {
-                error &&
-                <Alert
-                    className="mt-3"
-                    variant="danger"
-                >
-                    {error}
-                </Alert>
-            }
-
+            {mensaje && <Alert className="mt-3" variant="success">{mensaje}</Alert>}
+            {error && <Alert className="mt-3" variant="danger">{error}</Alert>}
         </div>
-
+        
     );
 };
 
