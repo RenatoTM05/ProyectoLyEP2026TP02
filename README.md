@@ -1,28 +1,40 @@
 # TRABAJO INTEGRADOR FINAL - PROGRAMACION VISUAL
 
-## Descripcion TP Integrador - 2026
+## Descripción TP Integrador - 2026
 
-Este proyecto consiste en la construccion de un Panel de Control de Clientes utilizando React y Vite. Esta aplicacion permite la gestion y visualizacion de informacion de clientes a traves del consumo de datos de la API pública FakeStoreAPI, ademas de la navegacion entre distintas vistas de forma dinamica.
+Este proyecto consiste en la construcción de un Panel de Control de Clientes utilizando React y Vite. Esta aplicación permite la gestión y visualización de información de clientes a través del consumo de datos de la API pública FakeStoreAPI, además de la navegación entre distintas vistas de forma dinámica. El proyecto ahora cuenta con un backend propio desarrollado en Node.js, Express y MongoDB.
 
-Se implementaran tecnologias como React Router Dom, Context API, LocalStorage, peticiones asincronicas y el uso de un framework de interfaz de usuario, para que la experiencia del usuario sea mas dinamica e interactiva.
+## Instalación y Configuración
 
-## Flujo de Trabajo para Equipos LyEP - 2026
+Para iniciar el proyecto correctamente, sigue los siguientes pasos:
 
-Este repositorio está configurado como base para práctica profesional. Si sos parte de un equipo de trabajo, seguí las instrucciones del TP01.
+### 1. Variables de Entorno (.env)
+El backend requiere ciertas variables de entorno para funcionar (como la cadena de conexión a MongoDB y los secretos de JWT).
+*   **Enlace al archivo `.env` real**: https://drive.google.com/file/d/17fekwzdGcimxr3McurJA19CE5yhD2sma/view?usp=sharing
+*   **Instrucciones**: Descarga el archivo `.env` desde el enlace proporcionado y colócalo en la carpeta `server/` de este proyecto. (También puedes guiarte con el archivo `server/.env.example`).
 
-El flujo general es:
+### 2. Levantar el Backend (Servidor)
+Abre una terminal en la raíz del proyecto y ejecuta:
+```bash
+cd server
+npm install
+npm run dev
+```
 
-1. Hacé fork de este repositorio
-2. Cloná tu fork localmente
-3. Agregá este repo como upstream: git remote add upstream [URL]
-4. Trabajá en ramas feature: git checkout -b feature/nombre-mejora
-5. Hacé commits semánticos frecuentes
-6. Abrí un Pull Request desde tu fork hacia este repo
+### 3. Levantar el Frontend (Cliente)
+Abre otra terminal en la raíz del proyecto y ejecuta:
+```bash
+cd client
+npm install
+npm run dev
+```
+
+## Credenciales de Acceso por Defecto
+Para probar el sistema, puedes iniciar sesión con las siguientes credenciales preconfiguradas:
+*   **Usuario:** tu_email@gmail.com
+*   **Contraseña:** TuPassword123
 
 ## Licencia de Uso
-
 El código fuente está bajo licencia MIT.
-
 La documentación y material pedagógico están bajo Creative Commons Attribution 4.0.
-
 © 2026 — Cátedra Legislación y Ejercicio Profesional - Carrera Analista Programador Universitario - FI UNJu
