@@ -1,7 +1,7 @@
 import "../css/listaclientes.css";
 import { useCallback, useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
-import FormCliente from "../components/FormCliente";
+import clientesService from "../services/clientesService";
 
 const ListaClientes = () => {
   const location = useLocation();
@@ -14,18 +14,29 @@ const ListaClientes = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
+  const obtenerNombreCompleto = (cliente) => {
+    if (cliente.nombre) {
+      return `${cliente.nombre} ${cliente.apellido || ''}`.trim();
+    }
+    if (cliente.name) {
+      return `${cliente.name.firstname || ''} ${cliente.name.lastname || ''}`.trim();
+    }
+    return cliente.username || "Sin nombre";
+  };
+
+  const obtenerCiudad = (cliente) => {
+    return cliente.ciudad || cliente.address?.city || "No especificada";
+  };
+
+  const obtenerTelefono = (cliente) => {
+    return cliente.telefono || cliente.phone || "No especificado";
+  };
+
   const cargarClientes = useCallback(() => {
     setLoading(true);
     setError("");
 
-    fetch("https://fakestoreapi.com/users")
-      .then((res) => {
-        if (!res.ok) {
-          throw new Error("No se pudo obtener la lista de clientes.");
-        }
-
-        return res.json();
-      })
+    clientesService.obtenerClientes()
       .then((data) => {
         const clienteEliminado = location.state?.clienteEliminado;
 
@@ -43,8 +54,8 @@ const ListaClientes = () => {
           window.history.replaceState({}, document.title);
         }
       })
-      .catch((error) => {
-        setError(error.message || "Ocurrió un error inesperado.");
+      .catch((err) => {
+        setError(err.response?.data?.mensaje || err.message || "Ocurrió un error inesperado al obtener clientes.");
       })
       .finally(() => {
         setLoading(false);
@@ -53,33 +64,35 @@ const ListaClientes = () => {
 
   useEffect(() => {
     const inicioCarga = window.setTimeout(cargarClientes, 0);
-
+    
     return () => window.clearTimeout(inicioCarga);
   }, [cargarClientes]);
 
   const consulta = busqueda.toLowerCase();
 
-  const clientesFiltrados = clientes.filter(
-    (cliente) =>
-      cliente.name.firstname.toLowerCase().includes(consulta) ||
-      cliente.name.lastname.toLowerCase().includes(consulta) ||
-      cliente.address.city.toLowerCase().includes(consulta) ||
-      cliente.email.toLowerCase().includes(consulta)
-  );
+  const clientesFiltrados = clientes.filter((cliente) => {
+    const nombre = obtenerNombreCompleto(cliente).toLowerCase();
+    const ciudad = obtenerCiudad(cliente).toLowerCase();
+    const email = (cliente.email || "").toLowerCase();
+
+    return (
+      nombre.includes(consulta) ||
+      ciudad.includes(consulta) ||
+      email.includes(consulta)
+    );
+  });
 
   const clientesOrdenados = [...clientesFiltrados].sort((clienteA, clienteB) => {
     const valores = {
-      nombre: `${clienteA.name.firstname} ${clienteA.name.lastname}`
+      nombre: obtenerNombreCompleto(clienteA)
         .toLowerCase()
-        .localeCompare(
-          `${clienteB.name.firstname} ${clienteB.name.lastname}`.toLowerCase()
-        ),
-      email: clienteA.email
+        .localeCompare(obtenerNombreCompleto(clienteB).toLowerCase()),
+      email: (clienteA.email || "")
         .toLowerCase()
-        .localeCompare(clienteB.email.toLowerCase()),
-      ciudad: clienteA.address.city
+        .localeCompare((clienteB.email || "").toLowerCase()),
+      ciudad: obtenerCiudad(clienteA)
         .toLowerCase()
-        .localeCompare(clienteB.address.city.toLowerCase()),
+        .localeCompare(obtenerCiudad(clienteB).toLowerCase()),
     };
 
     return direccionOrden === "ascendente"
@@ -88,14 +101,10 @@ const ListaClientes = () => {
   });
 
   const clientesPorPagina = 5;
-  const totalPaginas = Math.ceil(
-    clientesOrdenados.length / clientesPorPagina
-  );
+  const totalPaginas = Math.ceil(clientesOrdenados.length / clientesPorPagina);
 
   const paginaValida =
-    totalPaginas === 0
-      ? 1
-      : Math.min(paginaActual, totalPaginas);
+    totalPaginas === 0 ? 1 : Math.min(paginaActual, totalPaginas);
 
   const indiceInicial = (paginaValida - 1) * clientesPorPagina;
 
@@ -217,20 +226,12 @@ const ListaClientes = () => {
               {clientesPaginados.map((cliente) => (
                 <tr key={cliente.id}>
                   <td>{cliente.id}</td>
-
-                  <td>
-                    {cliente.name.firstname} {cliente.name.lastname}
-                  </td>
-
+                  <td>{obtenerNombreCompleto(cliente)}</td>
                   <td>{cliente.email}</td>
-                  <td>{cliente.phone}</td>
-                  <td>{cliente.address.city}</td>
-
+                  <td>{obtenerTelefono(cliente)}</td>
+                  <td>{obtenerCiudad(cliente)}</td>
                   <td>
-                    <Link
-                      className="btn-ficha"
-                      to={`/clientes/${cliente.id}`}
-                    >
+                    <Link className="btn-ficha" to={`/clientes/${cliente.id}`}>
                       Ver Ficha Completa
                     </Link>
                   </td>
@@ -240,7 +241,7 @@ const ListaClientes = () => {
           </table>
         </>
       )}
-      
+
       {totalPaginas > 1 && (
         <div className="paginacion-clientes">
           <button

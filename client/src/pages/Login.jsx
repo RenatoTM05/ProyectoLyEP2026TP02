@@ -36,10 +36,10 @@ const Login = () => {
     setErrores(nuevosErrores)
     return Object.keys(nuevosErrores).length === 0
   }
-  const manejarSubmit = (e) => {
+  const manejarSubmit = async (e) => {
     e.preventDefault()
     if (!validar()) return
-    const resultado = AutorizacionesService.login(
+    const resultado = await AutorizacionesService.login(
       email,
       password,
       sector
@@ -48,6 +48,7 @@ const Login = () => {
       alert('Verifique los datos')
       return
     }
+    localStorage.setItem('token', resultado.token)
     localStorage.setItem('role', resultado.usuario.sector)
     setAdmin(resultado.usuario)
     navigate('/')

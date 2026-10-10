@@ -7,13 +7,15 @@ import DetalleCliente from '../pages/DetalleCliente'
 import ErrorPage from '../pages/ErrorPage'
 import RutaProtegida from '../components/RutaProtegida'
 import FormCliente from '../components/FormCliente'
+import RegistroUsuario from '../pages/RegistroUsuario'
+
 const AppRoutes = () => {
   return (
     <Routes>
       <Route
         path="/registro"
         element={
-          <RutaProtegida>
+          <RutaProtegida sectorRequerido="Gerencia">
             <RegistroUsuario />
           </RutaProtegida>
         }
@@ -28,15 +30,15 @@ const AppRoutes = () => {
         }
       />
       <Route
-      path="/Formulario"
-      element={
-         <RutaProtegida>
-           <FormCliente/>
-         </RutaProtegida>
-      }
+        path="/Formulario"
+        element={
+          <RutaProtegida>
+            <FormCliente />
+          </RutaProtegida>
+        }
       />
 
-      
+
       <Route
         path="/clientes"
         element={
@@ -48,14 +50,15 @@ const AppRoutes = () => {
       <Route
         path="/clientes/:id"
         element={
-         <RutaProtegida>
-          <DetalleCliente />
-         </RutaProtegida>
-      }
+          <RutaProtegida>
+            <DetalleCliente />
+          </RutaProtegida>
+        }
       />
       <Route path="*" element={<ErrorPage />} />
-
+      
     </Routes>
   )
 }
+
 export default AppRoutes

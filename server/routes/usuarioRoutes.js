@@ -1,10 +1,11 @@
-const express= require('express');
-const usuarioController= require('../controllers/usuarioController');
-const router=express.Router();
-const {protegerRuta}= require('../middleware/authMiddleware');
+const express = require('express');
+const usuarioController = require('../controllers/usuarioController');
+const router = express.Router();
+const { protegerRuta, autorizarSector } = require('../middleware/authMiddleware');
 
-router.post('/registro',protegerRuta,usuarioController.registrarUsuario);
-router.post('/login',usuarioController.login);
-router.delete('/deleteUser/:id',protegerRuta,usuarioController.deleteUser);
-router.get('/listar', usuarioController.listarUsuarios)// dejo esto oculto para que puedan ver los usuarios que estan creados asi se loguean
- module.exports = router;
+router.post('/registro', protegerRuta, autorizarSector('Gerencia'), usuarioController.registrarUsuario);
+router.post('/login', usuarioController.login);
+router.delete('/deleteUser/:id', protegerRuta, autorizarSector('Gerencia'), usuarioController.deleteUser);
+router.get('/listar', usuarioController.listarUsuarios);//se deja por el momento en caso de olvidarnos 
+
+module.exports = router;

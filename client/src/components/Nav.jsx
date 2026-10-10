@@ -25,7 +25,7 @@ const Nav = () => {
                         </NavLink>
                     </li>
                 )}
-                {admin && (
+                {admin && admin.sector === 'Gerencia' && (
                     <li>
                         <NavLink to="/registro">
                             Crear Usuarios
@@ -37,4 +37,5 @@ const Nav = () => {
     );
     
 };
+
 export default Nav;

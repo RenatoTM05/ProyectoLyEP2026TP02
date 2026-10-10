@@ -1,13 +1,11 @@
 import '../css/detallecliente.css'
-
 import { useEffect, useState, useRef, useCallback } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import FormCliente from "../components/FormCliente";
-import { Link } from "react-router-dom";
+import clientesService from "../services/clientesService";
 
- 
 const DetalleCliente = () => {
- const { id } = useParams();
+  const { id } = useParams();
   const navigate = useNavigate();
   const role = localStorage.getItem("role");
 
@@ -27,26 +25,19 @@ const DetalleCliente = () => {
     setCliente(null);
 
     try {
-      const res = await fetch(`https://fakestoreapi.com/users/${id}`);
-
-      if (res.status === 404) {
+      const data = await clientesService.obtenerClientePorId(id);
+      if (!data || (!data.id && !data._id)) {
         setClienteInexistente(true);
         return;
       }
-
-      if (!res.ok) {
-        throw new Error("No se pudo obtener la ficha del cliente.");
-      }
-
-      const data = await res.json();
-      if (!data?.id || !data?.name || !data?.address) {
-        setClienteInexistente(true);
-        return;
-      }
-
       setCliente(data);
-    } catch (error) {
-      setError(error.message || "Ocurrió un error inesperado.");
+    } catch (err) {
+      if (err.response?.status === 404) {
+        setClienteInexistente(true);
+      } else {
+        setError(err.response?.data?.mensaje || err.message || "Ocurrió un error inesperado.");
+      }
+      
     } finally {
       setLoading(false);
     }
@@ -56,41 +47,29 @@ const DetalleCliente = () => {
     cargarCliente();
   }, [cargarCliente]);
 
-const eliminarCliente = async () => {
-  const confirmar = window.confirm(
-    "¿Está seguro de que desea eliminar este cliente?"
-  );
-
-  if (!confirmar) {
-    return;
-  }
-
-  setEliminando(true);
-  setMensaje("");
-
-  try {
-    const respuesta = await fetch(
-      `https://fakestoreapi.com/users/${id}`,
-      {
-        method: "DELETE",
-      }
+  const eliminarCliente = async () => {
+    const confirmar = window.confirm(
+      "¿Está seguro de que desea eliminar este cliente?"
     );
 
-    if (!respuesta.ok) {
-      throw new Error("No se pudo eliminar el cliente");
-    }
+    if (!confirmar) return;
 
-    setMensaje("Cliente eliminado correctamente");
+    setEliminando(true);
+    setMensaje("");
 
-    setTimeout(() => {
-      navigate("/clientes", { state: { clienteEliminado: Number(id) } });
+    try {
+      await clientesService.eliminarCliente(id);
+      setMensaje("Cliente eliminado correctamente");
+
+      setTimeout(() => {
+        navigate("/clientes", { state: { clienteEliminado: id } });
+        setEliminando(false);
+      }, 1000);
+    } catch (err) {
+      setMensaje(err.response?.data?.mensaje || "Error al eliminar cliente");
       setEliminando(false);
-    }, 1000);
-  } catch {
-    setMensaje("Error al eliminar cliente");
-    setEliminando(false);
-  }
-};
+    }
+  };
 
   if (loading) {
     return (
@@ -127,20 +106,22 @@ const eliminarCliente = async () => {
       <h1>Ficha del Cliente</h1>
       <p>Rol actual: {role}</p>
 
-      {mensaje && <p className = 'mensaje-eliminado'>{mensaje}</p>}
+      {mensaje && <p className='mensaje-eliminado'>{mensaje}</p>}
       {editando && (
-          <div ref={formularioRef}>
-            <FormCliente cliente={cliente} />
-          </div>
+        <div ref={formularioRef}>
+          <FormCliente cliente={cliente} />
+        </div>
       )}
 
       <p>
-        <strong>ID:</strong> {cliente.id}
+        <strong>ID:</strong> {cliente.id || cliente._id}
       </p>
 
       <p>
         <strong>Nombre:</strong>{" "}
-        {cliente.name.firstname} {cliente.name.lastname}
+        {cliente.nombre
+          ? `${cliente.nombre} ${cliente.apellido || ''}`.trim()
+          : `${cliente.name?.firstname || ''} ${cliente.name?.lastname || ''}`.trim()}
       </p>
 
       <p>
@@ -148,25 +129,17 @@ const eliminarCliente = async () => {
       </p>
 
       <p>
-        <strong>Teléfono:</strong> {cliente.phone}
+        <strong>Teléfono:</strong> {cliente.telefono || cliente.phone || 'No especificado'}
       </p>
 
       <h2>Dirección</h2>
 
       <p>
-        <strong>Calle:</strong> {cliente.address.street}
+        <strong>Dirección:</strong> {cliente.direccion || cliente.address?.street || 'No especificada'}
       </p>
 
       <p>
-        <strong>Número:</strong> {cliente.address.number}
-      </p>
-
-      <p>
-        <strong>Código Postal:</strong> {cliente.address.zipcode}
-      </p>
-
-      <p>
-        <strong>Ciudad:</strong> {cliente.address.city}
+        <strong>Ciudad:</strong> {cliente.ciudad || cliente.address?.city || 'No especificada'}
       </p>
 
       <h2>Credenciales</h2>
@@ -175,9 +148,7 @@ const eliminarCliente = async () => {
         <strong>Usuario:</strong> {cliente.username}
       </p>
 
-      <p>
-        <strong>Contraseña:</strong> {cliente.password}
-      </p>
+
 
       {role?.trim() === "Gerencia" && (
         <>
