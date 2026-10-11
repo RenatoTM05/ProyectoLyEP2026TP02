@@ -10,7 +10,6 @@ Para iniciar el proyecto correctamente, sigue los siguientes pasos:
 
 ### 1. Variables de Entorno (.env)
 El backend requiere ciertas variables de entorno para funcionar (como la cadena de conexión a MongoDB y los secretos de JWT).
-*   **Enlace al archivo `.env` real**: https://drive.google.com/file/d/17fekwzdGcimxr3McurJA19CE5yhD2sma/view?usp=sharing
 *   **Instrucciones**: Descarga el archivo `.env` desde el enlace proporcionado y colócalo en la carpeta `server/` de este proyecto. (También puedes guiarte con el archivo `server/.env.example`).
 
 ### 2. Levantar el Backend (Servidor)
